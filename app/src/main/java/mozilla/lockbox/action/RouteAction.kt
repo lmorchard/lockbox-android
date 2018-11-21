@@ -14,6 +14,7 @@ sealed class RouteAction : Action {
     object ItemList : RouteAction()
     object Login : RouteAction()
     object SettingList : RouteAction()
+    object FaqList : RouteAction()
     object AccountSetting : RouteAction()
     object AutoLockSetting : RouteAction()
     object Back : RouteAction()
