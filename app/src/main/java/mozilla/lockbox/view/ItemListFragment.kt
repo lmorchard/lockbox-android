@@ -41,6 +41,7 @@ import mozilla.lockbox.action.Setting
 import mozilla.lockbox.adapter.ItemListSortAdapter
 import mozilla.lockbox.extensions.view.itemClicks
 import mozilla.lockbox.support.dpToPixels
+import mozilla.lockbox.support.showAndRemove
 
 @ExperimentalCoroutinesApi
 class ItemListFragment : CommonFragment(), ItemListView {
@@ -180,5 +181,13 @@ class ItemListFragment : CommonFragment(), ItemListView {
 
         // scroll list view to top
         scrollToTop()
+    }
+
+    override fun loading(isLoading: Boolean) {
+        if (isLoading) {
+            showAndRemove(view!!.loadingView, view!!.entriesView)
+        } else {
+            showAndRemove(view!!.entriesView, view!!.loadingView)
+        }
     }
 }

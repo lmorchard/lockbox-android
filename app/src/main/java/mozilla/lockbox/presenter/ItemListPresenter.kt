@@ -28,6 +28,7 @@ import mozilla.lockbox.store.DataStore
 import mozilla.lockbox.store.FingerprintStore
 import mozilla.lockbox.store.SettingStore
 import mozilla.lockbox.support.asOptional
+import java.util.concurrent.TimeUnit
 
 interface ItemListView {
     val itemSelection: Observable<ItemViewModel>
@@ -38,6 +39,7 @@ interface ItemListView {
     fun updateItems(itemList: List<ItemViewModel>)
     fun updateItemListSort(sort: Setting.ItemListSort)
     fun setDisplayName(text: String)
+    fun loading(isLoading: Boolean)
 }
 
 @ExperimentalCoroutinesApi
@@ -60,28 +62,33 @@ class ItemListPresenter(
                         Setting.ItemListSort.RECENTLY_USED -> { pair.first.sortedBy { -it.timeLastUsed } }
                     }
                 }
-                .mapToItemViewModelList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::updateItems)
-                .addTo(compositeDisposable)
+            .mapToItemViewModelList()
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { view.loading(true) }
+            .subscribe({
+                view.loading(false)
+                view.updateItems(it)
+            }, {})
+            .addTo(compositeDisposable)
 
         settingStore.itemListSortOrder
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::updateItemListSort)
-                .addTo(compositeDisposable)
+            .distinctUntilChanged()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(view::updateItemListSort)
+            .addTo(compositeDisposable)
 
         view.itemSelection
-                .subscribe { it ->
-                    dispatcher.dispatch(RouteAction.ItemDetail(it.guid))
-                }
-                .addTo(compositeDisposable)
+            .subscribe { it ->
+                dispatcher.dispatch(RouteAction.ItemDetail(it.guid))
+            }
+            .addTo(compositeDisposable)
 
         view.filterClicks
-                .subscribe {
-                    dispatcher.dispatch(RouteAction.Filter)
-                }
-                .addTo(compositeDisposable)
+            .subscribe {
+                dispatcher.dispatch(RouteAction.Filter)
+            }
+            .addTo(compositeDisposable)
 
         view.menuItemSelections
             .subscribe(this::onMenuItem)
@@ -97,9 +104,9 @@ class ItemListPresenter(
             .addTo(compositeDisposable)
 
         view.sortItemSelection
-                .subscribe { sortBy ->
-                    dispatcher.dispatch(SettingAction.ItemListSortOrder(sortBy))
-                }.addTo(compositeDisposable)
+            .subscribe { sortBy ->
+                dispatcher.dispatch(SettingAction.ItemListSortOrder(sortBy))
+            }.addTo(compositeDisposable)
 
         accountStore.profile
             .map {
