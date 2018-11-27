@@ -12,10 +12,12 @@ import android.os.Build
 import com.squareup.leakcanary.LeakCanary
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mozilla.components.support.base.log.Log
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.base.log.sink.AndroidLogSink
 import mozilla.lockbox.presenter.ApplicationPresenter
+import mozilla.lockbox.store.AutoLockStore
 import mozilla.lockbox.store.ClipboardStore
 import mozilla.lockbox.store.ContextStore
 import mozilla.lockbox.store.DataStore
@@ -35,6 +37,7 @@ sealed class LogProvider {
 
 val log = LogProvider.log
 
+@ExperimentalCoroutinesApi
 class LockboxApplication : Application() {
 
     private lateinit var presenter: ApplicationPresenter
@@ -68,6 +71,7 @@ class LockboxApplication : Application() {
             FxASyncDataStoreSupport.shared,
             ClipboardStore.shared,
             FingerprintStore.shared,
+            AutoLockStore.shared,
             TelemetryStore.shared
         )
 
