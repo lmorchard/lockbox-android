@@ -13,6 +13,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.jakewharton.rxbinding2.view.clicks
@@ -43,20 +45,36 @@ class FxALoginFragment : BackableFragment(), FxALoginView {
         if (!isDebug()) {
             skipFxA.visibility = View.GONE
         }
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("ELISETEST: onViewCreated hit")
         super.onViewCreated(view, savedInstanceState)
         view.toolbar.setNavigationIcon(R.drawable.ic_close)
     }
 
+    init {
+        println("ELISETEST: init FxaLoginFragment")
+    }
+
     override fun loadURL(url: String) {
+        println("ELISETEST: loadUrl hit")
         webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 webViewObserver?.accept(url)
 
                 super.onPageStarted(view, url, favicon)
+            }
+
+            override fun onReceivedHttpError(
+                view: WebView?,
+                request: WebResourceRequest?,
+                errorResponse: WebResourceResponse?
+            ) {
+                super.onReceivedHttpError(view, request, errorResponse)
+                println("ELISETEST: error: $errorResponse\n request: $request")
             }
         }
 
