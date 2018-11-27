@@ -35,6 +35,7 @@ import org.mockito.Mock
 import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.robolectric.RobolectricTestRunner
+import java.util.concurrent.TimeUnit
 import org.mockito.Mockito.`when` as whenCalled
 
 private val username = "dogs@dogs.com"
@@ -77,6 +78,7 @@ open class ItemListPresenterTest {
         var updateItemsArgument: List<ItemViewModel>? = null
 
         var itemListSort: Setting.ItemListSort? = null
+        var isLoading: Boolean? = null
         val menuItemSelectionStub = PublishSubject.create<Int>()
 
         val itemSelectedStub = PublishSubject.create<ItemViewModel>()
@@ -115,8 +117,8 @@ open class ItemListPresenterTest {
         }
 
         override fun loading(isLoading: Boolean) {
+            this.isLoading = isLoading
         }
-
     }
 
     class FakeDataStore : DataStore() {
@@ -169,9 +171,12 @@ open class ItemListPresenterTest {
     @Test
     fun receivingPasswordList_somePasswords() {
         val list = listOf(password1, password2, password3)
-        dataStore.listStub.onNext(list)
         val expectedList = listOf(password2, password3, password1).map { it.toViewModel() }
 
+        dataStore.listStub.test().awaitTerminalEvent(1200, TimeUnit.MILLISECONDS)
+        dataStore.listStub.onNext(list)
+
+        Assert.assertEquals(false, view.isLoading)
         Assert.assertEquals(expectedList, view.updateItemsArgument)
         Assert.assertEquals(Setting.ItemListSort.ALPHABETICALLY, view.itemListSort)
     }
@@ -179,11 +184,13 @@ open class ItemListPresenterTest {
     @Test
     fun `updates sort order of list when item sort order menu changes`() {
         val list = listOf(password1, password2, password3)
+        dataStore.listStub.test().awaitTerminalEvent(1200, TimeUnit.MILLISECONDS)
         dataStore.listStub.onNext(list)
         val alphabetically = listOf(password2, password3, password1).map { it.toViewModel() }
         val lastUsed = listOf(password3, password2, password1).map { it.toViewModel() }
 
         // default
+        Assert.assertEquals(false, view.isLoading)
         Assert.assertEquals(alphabetically, view.updateItemsArgument)
         Assert.assertEquals(Setting.ItemListSort.ALPHABETICALLY, view.itemListSort)
 
