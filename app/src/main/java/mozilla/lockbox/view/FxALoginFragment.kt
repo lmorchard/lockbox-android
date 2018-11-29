@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.fragment_fxa_login.*
 import kotlinx.android.synthetic.main.fragment_fxa_login.view.*
 import kotlinx.android.synthetic.main.include_backable.view.*
 import mozilla.lockbox.R
+import mozilla.lockbox.log
 import mozilla.lockbox.presenter.FxALoginPresenter
 import mozilla.lockbox.presenter.FxALoginView
 import mozilla.lockbox.support.isDebug
@@ -42,25 +43,18 @@ class FxALoginFragment : BackableFragment(), FxALoginView {
         view.webView.settings.javaScriptEnabled = true
         CookieManager.getInstance().setAcceptCookie(true)
 
-        if (!isDebug()) {
+        if (!isDebug())
             skipFxA.visibility = View.GONE
-        }
 
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        println("ELISETEST: onViewCreated hit")
         super.onViewCreated(view, savedInstanceState)
         view.toolbar.setNavigationIcon(R.drawable.ic_close)
     }
 
-    init {
-        println("ELISETEST: init FxaLoginFragment")
-    }
-
     override fun loadURL(url: String) {
-        println("ELISETEST: loadUrl hit")
         webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 webViewObserver?.accept(url)
@@ -73,8 +67,8 @@ class FxALoginFragment : BackableFragment(), FxALoginView {
                 request: WebResourceRequest?,
                 errorResponse: WebResourceResponse?
             ) {
+                log.debug("Http error response $errorResponse on request $request.")
                 super.onReceivedHttpError(view, request, errorResponse)
-                println("ELISETEST: error: $errorResponse\n request: $request")
             }
         }
 
