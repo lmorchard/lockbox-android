@@ -28,6 +28,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import kotlinx.android.synthetic.main.fragment_faq.view.*
 import kotlinx.android.synthetic.main.fragment_item_list.view.*
 import mozilla.lockbox.R
 import mozilla.lockbox.adapter.ItemListAdapter
@@ -37,6 +38,7 @@ import mozilla.lockbox.presenter.ItemListView
 import kotlinx.android.synthetic.main.fragment_item_list.*
 import kotlinx.android.synthetic.main.nav_header.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import mozilla.lockbox.R.id.faq_menu_item
 import mozilla.lockbox.action.Setting
 import mozilla.lockbox.adapter.ItemListSortAdapter
 import mozilla.lockbox.extensions.view.itemClicks
