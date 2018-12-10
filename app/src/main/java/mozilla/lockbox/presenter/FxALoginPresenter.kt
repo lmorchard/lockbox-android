@@ -10,6 +10,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import io.reactivex.rxkotlin.addTo
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mozilla.lockbox.action.AccountAction
 import mozilla.lockbox.action.DataStoreAction
 import mozilla.lockbox.action.LifecycleAction
@@ -17,6 +18,7 @@ import mozilla.lockbox.flux.Dispatcher
 import mozilla.lockbox.flux.Presenter
 import mozilla.lockbox.store.AccountStore
 import mozilla.lockbox.support.Constant
+import mozilla.lockbox.support.isDebug
 
 interface FxALoginView {
     var webViewObserver: Consumer<String?>?
@@ -24,6 +26,7 @@ interface FxALoginView {
     fun loadURL(url: String)
 }
 
+@ExperimentalCoroutinesApi
 class FxALoginPresenter(
     private val view: FxALoginView,
     private val dispatcher: Dispatcher = Dispatcher.shared,
@@ -41,17 +44,19 @@ class FxALoginPresenter(
             }
         }
 
-        view.skipFxAClicks
-            .subscribe {
-                dispatcher.dispatch(LifecycleAction.UseTestData)
-            }
-            .addTo(compositeDisposable)
-
         accountStore.loginURL
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 view.loadURL(it)
             }
             .addTo(compositeDisposable)
+
+        if (isDebug()) {
+            view.skipFxAClicks
+                .subscribe {
+                    dispatcher.dispatch(LifecycleAction.UseTestData)
+                }
+                .addTo(compositeDisposable)
+        }
     }
 }
