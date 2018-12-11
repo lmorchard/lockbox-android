@@ -20,6 +20,7 @@ sealed class RouteAction : Action {
     object LockScreen : RouteAction()
     object Filter : RouteAction()
     object FaqList : RouteAction()
+    object SendFeedback : RouteAction()
     data class ItemDetail(val id: String) : RouteAction()
     data class OpenWebsite(val url: String) : RouteAction()
     data class SystemSetting(val setting: SettingIntent) : RouteAction()
