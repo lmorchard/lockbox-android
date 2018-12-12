@@ -28,6 +28,7 @@ import mozilla.lockbox.support.isDebug
 
 class FxALoginFragment : BackableFragment(), FxALoginView {
     override var webViewObserver: Consumer<String?>? = null
+
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater,
